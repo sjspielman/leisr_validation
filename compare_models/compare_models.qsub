@@ -1,0 +1,52 @@
+#!/bin/bash
+#PBS -N comparemodels
+#PBS -q avx
+#PBS -l nodes=1:ppn=16
+#PBS -e e.$PBS_JOBNAME-$PBS_JOBID
+#PBS -o o.$PBS_JOBNAME-$PBS_JOBID
+
+
+export PATH=/usr/local/bin:$PATH
+
+PROJPATH=/home/sjspielman/leisr_validation/compare_models
+DATAPATH=$PROJPATH/enzyme_data
+RESULTPATH=$PROJPATH/inference
+
+DATA=${DATAPATH}/$1
+
+HYPATH=/home/sjspielman/hyphy
+MP=$HYPATH/HYPHYMP
+LIBPATH=$HYPATH/res
+BATCHFILE=$LIBPATH/TemplateBatchFiles/LEISR.bf
+
+
+#### WAG No
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y WAG No
+mv $DATA.json $DATA.WAG-No.json
+
+#### WAG G
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y WAG Gamma
+mv $DATA.json $DATA.WAG-G.json
+
+#### LG No
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y LG No
+mv $DATA.json $DATA.LG-No.json
+
+#### LG G
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y LG G
+mv $DATA.json $DATA.LG-G.json
+
+#### JTT No
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y JTT No
+mv $DATA.json $DATA.JTT-No.json
+
+#### JC G
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y JC69 G
+mv $DATA.json $DATA.JC69-G.json
+
+#### JC G
+$MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE $DATA y JC69 G
+mv $DATA.json $DATA.JC69-G.json
+
+
+

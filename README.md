@@ -9,4 +9,6 @@ This repository accompanies the manuscript `Relative evolutionary rate inference
 	+ Dependencies: `tidyverse`, `cowplot`, `purrr`, `broom` 
 + `simulations_rates` directory contains all simulated data and rate inferences.
 
++ `test1e5.fna` and `test1e5.fna.site-rates.json` are a simulated (nucleotide) alignment of 10,000 sequences, with 100 sites, which is confirmed to run in `LEISR` (as indicated in MS). 
+
 \*Please contact `stephanie.spielman<at>temple.edu` with questions.
