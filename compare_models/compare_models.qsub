@@ -1,7 +1,7 @@
 #!/bin/bash
 #PBS -N comparemodels
 #PBS -q avx
-#PBS -l nodes=1:ppn=16
+#PBS -l nodes=1:ppn=64
 #PBS -e e.$PBS_JOBNAME-$PBS_JOBID
 #PBS -o o.$PBS_JOBNAME-$PBS_JOBID
 
@@ -21,11 +21,15 @@ LIBPATH=$HYPATH/res
 BATCHFILE=$LIBPATH/TemplateBatchFiles/LEISR.bf
 
 for MODEL in LG WAG JTT JC69; do
-    for RV in G No; do
-        
-        JSON=$RESULTPATH/$DATA.$MODEL-$RV.LEISR.json
+    for RV in Gamma No; do
+       if [ $RV == "Gamma" ]; then
+	  RV2=G
+       else
+          RV2=No
+       fi 
+        JSON=$RESULTPATH/$DATA.$MODEL-$RV2.LEISR.json
         if [ ! -e $JSON ]; then
-            $MP LIBPATH=$LIBPATH CPU=16 $BATCHFILE ${DATAPATH}/$DATA y Protein $MODEL $RV
+            $MP LIBPATH=$LIBPATH  $BATCHFILE ${DATAPATH}/$DATA y Protein $MODEL $RV
             mv ${DATAPATH}/$DATA.LEISR.json  $JSON
         fi
     done
