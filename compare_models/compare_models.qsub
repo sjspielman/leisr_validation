@@ -9,7 +9,7 @@
 export PATH=/usr/local/bin:$PATH
 
 PROJPATH=/home/sjspielman/leisr_validation/compare_models
-DATAPATH=$PROJPATH/enzyme_data
+DATAPATH=$PROJPATH/data
 RESULTPATH=$PROJPATH/inference
 mkdir -p $RESULTPATH
 
@@ -20,7 +20,7 @@ MP=$HYPATH/HYPHYMP
 LIBPATH=$HYPATH/res
 BATCHFILE=$LIBPATH/TemplateBatchFiles/LEISR.bf
 
-for MODEL in LG WAG JTT JC69; do
+for MODEL in LG WAG JTT JC69 mtMAM cpREV HIVB; do
     for RV in Gamma No; do
        if [ $RV == "Gamma" ]; then
 	  RV2=G
