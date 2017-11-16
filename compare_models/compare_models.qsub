@@ -7,13 +7,14 @@
 
 
 export PATH=/usr/local/bin:$PATH
+TYPE=$1
+FILE=$2
+
 
 PROJPATH=/home/sjspielman/leisr_validation/compare_models
-DATAPATH=$PROJPATH/data
-RESULTPATH=$PROJPATH/inference
+DATAPATH=$PROJPATH/$TYPE
+RESULTPATH=$PROJPATH/$TYPE-inference
 mkdir -p $RESULTPATH
-
-DATA=$1
 
 HYPATH=/home/sjspielman/hyphy
 MP=$HYPATH/HYPHYMP
@@ -27,10 +28,10 @@ for MODEL in LG WAG JTT JC69 mtMAM cpREV HIVB; do
        else
           RV2=No
        fi 
-        JSON=$RESULTPATH/$DATA.$MODEL-$RV2.LEISR.json
+        JSON=$RESULTPATH/$FILE.$MODEL-$RV2.LEISR.json
         if [ ! -e $JSON ]; then
-            $MP LIBPATH=$LIBPATH  $BATCHFILE ${DATAPATH}/$DATA y Protein $MODEL $RV
-            mv ${DATAPATH}/$DATA.LEISR.json  $JSON
+            $MP LIBPATH=$LIBPATH  $BATCHFILE ${DATAPATH}/$FILE y Protein $MODEL $RV
+            mv ${DATAPATH}/$FILE.LEISR.json  $JSON
         fi
     done
 done

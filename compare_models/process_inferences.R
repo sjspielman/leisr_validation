@@ -6,6 +6,81 @@ require(broom)
 theme_set(theme_classic() + theme(axis.title = element_text(size=11), axis.text = element_text(size=10)))
 
 path = "inference/"
+
+################################# 
+########### model fit ###########
+
+model.fit <- read.csv(paste0(path,"model_fits.csv"))
+model.fit %>% 
+    group_by(dataset) %>%
+    arrange(dataset, AICc) %>%
+    mutate(AICc_rank = rank(AICc)) %>% 
+    mutate(deltaAICc = min(AICc) - AICc) -> model.aicc
+    
+model.aicc %>% 
+    filter(AICc_rank == 1) %>% 
+    group_by(model) %>%
+    tally() 
+# 1  JTT-G     4
+# 2   LG-G     1
+# 3  WAG-G    85
+# 4 WAG-No    10
+
+
+    
+model.aicc %>% 
+    filter(AICc_rank == 8) %>%
+    ungroup() %>%
+    group_by(model) %>%
+    tally() 
+# 1  JC69-G    33
+# 2 JC69-No    44
+   
+model.aicc %>% 
+    filter(AICc_rank == 7) %>%
+    ungroup() %>%
+    group_by(model) %>%
+    tally()      
+# 1  JC69-G    44
+# 2 JC69-No    39
+# 3   JTT-G     6
+# 4  JTT-No     1
+# 5    LG-G     3
+# 6   LG-No     2
+
+
+model.aicc %>% 
+    ungroup() %>%
+    filter(model %in% c("JC69-No", "JC69-G")) %>%
+    group_by(AICc_rank) %>%
+    tally()  
+#   AICc_rank     n
+#       <dbl> <int>
+# 1         4    10
+# 2         5     2
+# 3         6     8
+# 4         7    83
+# 5         8    77  
+
+model.aicc %>% 
+    filter(AICc_rank == 2) %>% 
+    ungroup() %>%
+    summarize(mean(deltaAICc), min(abs(deltaAICc)), max(abs(deltaAICc)))
+# # A tibble: 1 x 3
+#   `mean(deltaAICc)` `min(abs(deltaAICc))` `max(abs(deltaAICc))`
+#                    <dbl>                 <dbl>                 <dbl>
+# 1                -1958.132              27.5292               29917.6
+
+
+
+model.aicc %>% filter(AICc_rank <= 6) %>%
+    ggplot(aes(x = AICc_rank, y = deltaAICc, group = dataset)) + geom_line()
+
+
+
+
+
+path = "inference/"
 ### Read in hyphy inferences ###
 files <- dir(path = path, pattern = "*csv")
 data_frame(filename = files) %>%
@@ -13,11 +88,11 @@ data_frame(filename = files) %>%
            ~ read_csv(file.path(path, .)))) %>%
   unnest() %>%
   separate(filename, c("dataset", "blahh", "model", "blahhhh", "blahhhhhhh"), sep="\\.") %>%
-  dplyr::select(dataset, model, site, rate) -> ratesraw
+  dplyr::select(dataset, model, site, rate) -> rawrates
 
 
 #### No normalization
-rates <- ratesraw %>% 
+rates <- rawrates %>% 
             group_by(dataset, model) %>% 
             spread(model, rate)
 
@@ -42,33 +117,54 @@ zrates <- ratesraw %>%
                 select(-rate) %>%
                 spread(model, zscore) 
 
-
-### Normalized by mean of non-zero/non-infinite
-ratesraw %>% 
-    group_by(dataset, model) %>% 
-    filter(rate >1e-8, rate < 100) %>%
-    summarize(mean_noextremes = mean(rate), med_noextremes = median(rate)) %>% 
-    right_join(ratesraw) -> raw.withnoextreme
-        
-     
-### Normalized by non-extreme mean   
-normmean.noextreme <- raw.withnoextreme %>% 
-                        group_by(dataset, model) %>% 
-                        mutate(normrate = rate/mean_noextremes) %>%
-                        select(-rate,-mean_noextremes, -med_noextremes) %>%
-                        spread(model, normrate)
-
-## Normalized by non-extreme median   
-normmedian.noextreme <- raw.withnoextreme %>% 
-                        group_by(dataset, model) %>% 
-                        mutate(normrate = rate/med_noextremes) %>%
-                        select(-rate) %>%
-                        spread(model, normrate) 
-                
+# 
+# ### Normalized by mean of non-zero/non-infinite
+# ratesraw %>% 
+#     group_by(dataset, model) %>% 
+#     filter(rate >1e-8, rate < 100) %>%
+#     summarize(mean_noextremes = mean(rate), med_noextremes = median(rate)) %>% 
+#     right_join(ratesraw) -> raw.withnoextreme
+#         
+#      
+# ### Normalized by non-extreme mean   
+# normmean.noextreme <- raw.withnoextreme %>% 
+#                         group_by(dataset, model) %>% 
+#                         mutate(normrate = rate/mean_noextremes) %>%
+#                         select(-rate,-mean_noextremes, -med_noextremes) %>%
+#                         spread(model, normrate)
+# 
+# ## Normalized by non-extreme median   
+# normmedian.noextreme <- raw.withnoextreme %>% 
+#                         group_by(dataset, model) %>% 
+#                         mutate(normrate = rate/med_noextremes) %>%
+#                         select(-rate) %>%
+#                         spread(model, normrate) 
+#                 
 
       
 ###########################################################################################       
 ## Optimizing branch lengths with a gamma has little to no influence on rates, with exception of hard-to-estimate sites
+
+
+zrates %>%
+    group_by(dataset) %>%
+    do(corLG = cor(.$`LG-G`, .$`LG-No`, method = "spearman"),
+       corWAG = cor(.$`WAG-G`, .$`WAG-No`, method = "spearman"),
+       corJTT = cor(.$`JTT-G`, .$`JTT-No`, method = "spearman"),
+       corJC69 = cor(.$`JC69-G`, .$`JC69-No`, method = "spearman")) %>%
+    unnest(corLG, corWAG, corJTT, corJC69) %>%
+    summarize(mean(corLG), 
+              mean(corWAG), 
+              mean(corJTT), 
+              mean(corJC69), 
+              sd(corLG), 
+              sd(corWAG), 
+              sd(corJTT), 
+              sd(corJC69)) %>% print.data.frame()
+#   mean(corLG) mean(corWAG) mean(corJTT) mean(corJC69)   sd(corLG)  sd(corWAG)
+# 1   0.9983799    0.9983811    0.9984812     0.9978295 0.001992638 0.002258409
+#   sd(corJTT) sd(corJC69)
+# 1 0.00183936 0.002369673
 
 
 rates %>%
@@ -137,6 +233,14 @@ rates %>%
     nrow()   
 [1] 0    
 
+
+
+
+
+
+
+
+
 ####################################################################################################
 
 
@@ -171,6 +275,8 @@ rates %>%
 
 
 
+
+#####################################################################################
 
 
 
