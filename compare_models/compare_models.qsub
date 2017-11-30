@@ -21,7 +21,7 @@ MPI=$HYPATH/HYPHYMPI
 LIBPATH=$HYPATH/res
 BATCHFILE=$LIBPATH/TemplateBatchFiles/LEISR.bf
 
-for MODEL in LG WAG JTT JC69 mtMAM cpREV; do
+for MODEL in LG WAG JTT JC69 mtMet cpREV; do
     for RV in Gamma No; do
        if [ $RV == "Gamma" ]; then
 	  RV2=G
