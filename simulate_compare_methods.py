@@ -2,7 +2,7 @@
     Stephanie J. Spielman
     Code to simulate alignments and infer rates w/ LEISR and R4S.
     
-    Note that this script requires packages pyvolve (on pip) and phyphy (currently pre-release and under development but on github under sjspielman/phyphy)
+    Note that this script requires packages pyvolve and phyphy (both available in PyPI).
 """
 
 from phyphy import *
@@ -70,17 +70,16 @@ for rep in range(10):
         ### Hyphy inference #####
         print "     Running hyphy"
         print "          No rv"
-        h = HyPhy(build_path = "../../hyphy", suppress_log = True, quiet=True)
-        r = LEISR(hyphy=h, alignment = seqfile, tree = treefile, type = "protein", output = "sim.json", model = "WAG", plusF = True)
+        r = LEISR(alignment = seqfile, tree = treefile, type = "protein", output = "sim.json", model = "WAG")
         r.run_analysis()
-        p = HyPhyParser(json_path = "sim.json")
+        p = Extractor(r)
         p.extract_csv(hyphy_homo_csv)    
         os.system("rm sim.json")
 
         print "          Gamma"        
-        r = LEISR(hyphy=h, alignment = seqfile, tree = treefile, type = "protein", output = "sim.json", model = "WAG", rate_variation = "Gamma", plusF = True)
+        r = LEISR(alignment = seqfile, tree = treefile, type = "protein", output = "sim.json", model = "WAG", rate_variation = "Gamma")
         r.run_analysis()
-        p = HyPhyParser(json_path = "sim.json")
+        p = Extractor(r)
         p.extract_csv(hyphy_gamma_csv)    
         os.system("rm sim.json")
       
