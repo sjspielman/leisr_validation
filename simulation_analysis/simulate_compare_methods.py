@@ -14,12 +14,13 @@ from pyvolve import *
 
 
 """
+    NOTE:
     R code to make simulation trees:
     library(ape)
     for (n in c(25, 50, 100)){
         t <- rtree(n)
         t <- compute.brlen(t, rgamma, 0.25, 0.25)
-        write.tree(t, paste0("rtree", n, ".tre"))
+        write.tree(t, paste0("simulation_rates/rtree", n, ".tre"))
     } 
 """
 
@@ -91,7 +92,7 @@ for rep in range(10):
         try:
             rs4_to_csv("out.txt", ml_homo_csv)
         except:
-            pass
+            print("Rate4Site could not be parsed. Moving forward.")
         os.system("rm -f out.txt")
         os.system("rm -f r4s.res")
         os.system("rm -f TheTree.txt")   
@@ -101,7 +102,7 @@ for rep in range(10):
         try:
             rs4_to_csv("out.txt", ml_gamma_csv)
         except:
-            pass
+            print("Rate4Site could not be parsed. Moving forward.")
         os.system("rm -f out.txt")
         os.system("rm -f r4s.res")
         os.system("rm -f TheTree.txt")

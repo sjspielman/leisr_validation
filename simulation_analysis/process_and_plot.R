@@ -1,10 +1,10 @@
 require(tidyverse)
 require(cowplot)
-require(purrr)
 require(broom)
 
 theme_set(theme_classic() + theme(axis.title = element_text(size=11), axis.text = element_text(size=10)))
 inpath = "simulation_rates/"
+figpath = "../figures/"
 
 
 #############################################################################################
@@ -89,7 +89,7 @@ r2.bars <- ggplot(rsquareds.summary, aes(x = sim, y = meanr2, fill = comp)) +
                   ylab(expression(R^{2})) + xlab("Simulation Set") + 
                   coord_cartesian(ylim = c(0.85, 1)) +
                   scale_fill_brewer(palette = "Set1", name = "Comparison")
-save_plot("r2_barplot.pdf", r2.bars, base_width=8)
+save_plot(paste0(figpath,"r2_barplot.pdf"), r2.bars, base_width=8)
 
 
 
@@ -124,5 +124,5 @@ plotc <- rep0.spread %>%
             
             
 scatters <- plot_grid(plota, plotb, plotc, nrow=1, labels="auto")
-save_plot("replicate_100taxa_scatterplot.pdf", scatters, base_width=8, base_height=2)
+save_plot(paste0(figpath,"replicate_100taxa_scatterplot.pdf"), scatters, base_width=8, base_height=2)
 
