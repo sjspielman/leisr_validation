@@ -1,6 +1,8 @@
 ### LEISR validation
 
-This repository accompanies the manuscript `Relative evolutionary rate inference in HyPhy with LEISR` by SJ Spielman\* and SLK Pond.
+This repository accompanies the manuscript `Relative evolutionary rate inference in HyPhy with LEISR` by SJ Spielman\* and SLK Pond, currently in press at [PeerJ](https://peerj.com/).
+
+Please see the "Publication Release" under the releases tab for the version of this repository that accompanies the published manuscript.
 
 #### Dependencies
 
