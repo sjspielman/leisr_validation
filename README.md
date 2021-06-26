@@ -28,4 +28,4 @@ Please see the "Publication Release" under the releases tab for the version of t
 
 
 
-\*Please contact `stephanie.spielman<at>temple.edu` with questions.
+\*Please contact `spielman<at>rowan.edu` with questions.
